@@ -3,70 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deepesh | AI Portfolio</title>
+    <title>Deepesh Singh | Voice-Powered Portfolio</title>
+    <!-- Google Fonts for professional look -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #00ffcc; --bg: #0a0a0a; --text: #ffffff; }
-        body { font-family: 'Courier New', monospace; background: var(--bg); color: var(--text); text-align: center; margin: 0; overflow-x: hidden; }
-        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .status-box { border: 1px solid var(--primary); padding: 20px; border-radius: 10px; box-shadow: 0 0 20px var(--primary); margin-bottom: 20px; }
-        .mic-btn { background: var(--primary); border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .mic-btn:hover { transform: scale(1.1); box-shadow: 0 0 30px var(--primary); }
-        .section { height: 100vh; padding: 50px; border-top: 1px solid #333; }
-        #output { color: var(--primary); margin-top: 10px; font-style: italic; }
+        :root { --primary: #00ffcc; --bg: #0d1117; --card: #161b22; --text: #c9d1d9; }
+        * { box-sizing: border-box; }
+        body { font-family: 'JetBrains Mono', monospace; background: var(--bg); color: var(--text); margin: 0; line-height: 1.6; }
+        
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        
+        /* Hero Section */
+        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .hero h1 { font-size: 3rem; color: var(--primary); margin-bottom: 10px; text-shadow: 0 0 10px rgba(0,255,204,0.3); }
+        
+        .console { background: #000; padding: 20px; border-radius: 8px; border-left: 4px solid var(--primary); width: 100%; max-width: 600px; margin: 20px 0; text-align: left; }
+        
+        .mic-btn { background: var(--primary); color: #000; border: none; padding: 15px 40px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,255,204,0.2); }
+        .mic-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 25px rgba(0,255,204,0.4); }
+        .mic-btn:active { transform: translateY(0); }
+
+        /* Skills Section */
+        .section { min-height: 80vh; padding: 100px 20px; opacity: 0.3; transition: 1s; }
+        .section.active { opacity: 1; transform: scale(1.05); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 30px; }
+        .skill-card { background: var(--card); padding: 20px; border-radius: 10px; border-bottom: 3px solid var(--primary); text-align: center; }
+        
+        #status { color: var(--primary); font-weight: bold; }
+        .hint { font-size: 0.8rem; color: #8b949e; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="hero" id="home">
-        <div class="status-box">
-            <h1>SYSTEM: DEEPESH SINGH</h1>
-            <p>AI-Powered Portfolio Beta v1.0</p>
-            <p id="output">Click the mic and say "Hi Deepesh" or "Show Projects"</p>
-        </div>
-        <button class="mic-btn" onclick="startListening()">🎤 ACTIVATE VOICE CONTROL</button>
-    </div>
+    <div class="container">
+        <!-- Hero -->
+        <section class="hero" id="home">
+            <h1>DEEPESH SINGH</h1>
+            <p>BCA Student @ CCSU | Software Development Intern</p>
+            
+            <div class="console">
+                <div id="status">> System Idle. Waiting for command...</div>
+                <div id="user-input" style="color: #8b949e; margin-top: 10px;"></div>
+            </div>
 
-    <div class="section" id="about">
-        <h2>[ ABOUT ME ]</h2>
-        <p>BCA Student @ CCSU | Java & Python Enthusiast</p>
-    </div>
+            <button class="mic-btn" onclick="initVoice()">🎤 TAP TO SPEAK</button>
+            <p class="hint">Try saying: <b>"Show Skills"</b>, <b>"About"</b>, or <b>"Reset"</b></p>
+        </section>
 
-    <div class="section" id="projects">
-        <h2>[ PROJECTS ]</h2>
-        <p>1. Personal Portfolio (Live)<br>2. Voice Controlled Interface (Current)</p>
+        <!-- About -->
+        <section class="section" id="about">
+            <h2>[ 01. ABOUT_ME ]</h2>
+            <p>I am a high-energy BCA student focused on building elegant solutions through code. My goal is to bridge the gap between technical execution and user needs.</p>
+        </section>
+
+        <!-- Skills -->
+        <section class="section" id="skills">
+            <h2>[ 02. CORE_SKILLS ]</h2>
+            <div class="grid">
+                <div class="skill-card"><h3>JAVA</h3><p>OOPs, Data Structures</p></div>
+                <div class="skill-card"><h3>PYTHON</h3><p>Scripting, Logic</p></div>
+                <div class="skill-card"><h3>C++</h3><p>Competitive Coding</p></div>
+                <div class="skill-card"><h3>WEB DEV</h3><p>HTML5, CSS3, Bootstrap</p></div>
+            </div>
+        </section>
     </div>
 
     <script>
-        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+        const userInput = document.getElementById('user-input');
+
+        // 100% Compatible Speech Setup
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         
-        function startListening() {
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'en-US';
-            output.innerText = "Listening...";
+        if (!SpeechRecognition) {
+            status.innerText = "> Error: Browser not supported. Use Chrome.";
+            status.style.color = "red";
+        }
 
-            recognition.onresult = (event) => {
-                const command = event.results[0][0].transcript.toLowerCase();
-                output.innerText = 'You said: "' + command + '"';
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.continuous = false;
 
-                if (command.includes('hi') || command.includes('hello')) {
-                    speak("Hello! I am Deepesh's AI assistant. How can I help you?");
-                } else if (command.includes('project')) {
-                    document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
-                    speak("Navigating to projects section.");
-                } else if (command.includes('about')) {
-                    document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
-                    speak("Here is some information about Deepesh.");
-                } else {
-                    speak("I heard you, but I only respond to: Hi, Projects, or About.");
-                }
-            };
+        function initVoice() {
+            try {
+                recognition.start();
+                status.innerText = "> Listening... Speak now.";
+                status.style.color = "#00ffcc";
+            } catch (e) {
+                console.log("Already listening");
+            }
+        }
 
-            recognition.start();
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript.toLowerCase();
+            userInput.innerText = `Last Command: "${transcript}"`;
+            handleCommand(transcript);
+        };
+
+        recognition.onend = () => {
+            if(status.innerText === "> Listening... Speak now.") {
+                status.innerText = "> System Idle.";
+            }
+        };
+
+        function handleCommand(cmd) {
+            // Remove 'active' class from all
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+
+            if (cmd.includes('skill') || cmd.includes('tech')) {
+                scrollToSection('skills');
+                speak("Accessing core skills. Java, Python, and Web Development loaded.");
+            } 
+            else if (cmd.includes('about') || cmd.includes('who')) {
+                scrollToSection('about');
+                speak("Loading profile information.");
+            }
+            else if (cmd.includes('reset') || cmd.includes('home')) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                speak("Returning to home screen.");
+            }
+            else {
+                status.innerText = "> Unknown Command. Try 'Skills'.";
+                speak("Command not recognized. Please try again.");
+            }
+        }
+
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            el.scrollIntoView({ behavior: 'smooth' });
+            el.classList.add('active');
+            status.innerText = `> Navigating to ${id.toUpperCase()}...`;
         }
 
         function speak(text) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            window.speechSynthesis.speak(utterance);
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.rate = 0.9; // Thoda professional sound ke liye
+            msg.pitch = 1;
+            window.speechSynthesis.speak(msg);
         }
     </script>
 </body>
