@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Deepesh Singh | Titan Beast OS</title>
+    
+    <!-- Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=JetBrains+Mono:wght@300;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root { --main: #00f2ff; --sec: #ff0055; --bg: #020202; --panel: rgba(5, 5, 5, 0.95); }
+        * { box-sizing: border-box; margin: 0; padding: 0; cursor: crosshair; }
+        body { background: var(--bg); color: white; font-family: 'JetBrains Mono', monospace; overflow-x: hidden; }
+
+        /* Background Layers */
+        #canvas-bg { position: fixed; top: 0; left: 0; z-index: -1; }
+        .matrix-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.05; pointer-events: none; z-index: -1; }
+
+        /* Main UI */
+        section { min-height: 100vh; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 60px 20px; transition: transform 0.8s cubic-bezier(0.2, 1, 0.3, 1); }
+
+        .beast-frame {
+            border: 4px solid var(--main); padding: 50px;
+            background: var(--panel); backdrop-filter: blur(20px);
+            clip-path: polygon(10% 0, 90% 0, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0 90%, 0 10%);
+            width: 100%; max-width: 1000px; text-align: center;
+            box-shadow: 0 0 50px rgba(0, 242, 255, 0.2), inset 0 0 20px rgba(0, 242, 255, 0.1);
+            position: relative; overflow: hidden;
+        }
+
+        .beast-frame::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 242, 255, 0.1), transparent);
+            transform: rotate(45deg); animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan { 0% { transform: translate(-100%, -100%) rotate(45deg); } 100% { transform: translate(100%, 100%) rotate(45deg); } }
+
+        .title { font-family: 'Orbitron'; font-size: clamp(2.5rem, 10vw, 5rem); font-weight: 900; letter-spacing: 10px; color: var(--main); text-shadow: 0 0 30px var(--main); }
+        
+        .orb-container { position: relative; width: 150px; height: 150px; margin: 40px auto; }
+        .ai-orb {
+            width: 100%; height: 100%; border-radius: 50%; border: 4px solid var(--main);
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 40px var(--main); transition: 0.5s;
+        }
+        .ai-orb.active { border-color: var(--sec); box-shadow: 0 0 60px var(--sec); transform: scale(1.15); animation: pulse 0.5s infinite alternate; }
+
+        .status-bar { border-top: 1px solid #333; margin-top: 30px; padding-top: 15px; font-size: 0.7rem; color: var(--main); text-transform: uppercase; display: flex; justify-content: space-between; }
+
+        /* Modular Sections */
+        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; width: 100%; margin-top: 40px; }
+        .data-card { background: rgba(255,255,255,0.05); padding: 20px; border-left: 3px solid var(--main); text-align: left; transition: 0.3s; }
+        .data-card:hover { background: rgba(0, 242, 255, 0.1); transform: translateX(10px); }
+
+        /* Scroll Progress */
+        .progress-wrap { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 100; height: 200px; width: 2px; background: #222; }
+        .progress-bar { width: 100%; background: var(--main); height: 0%; box-shadow: 0 0 15px var(--main); }
+    </style>
+</head>
+<body>
+
+<canvas id="canvas-bg"></canvas>
+<div class="progress-wrap"><div class="progress-bar" id="p-bar"></div></div>
+
+<!-- HERO SECTION -->
+<section id="hero">
+    <div class="beast-frame">
+        <p style="color: var(--sec); letter-spacing: 5px;">[ TITAN_CORE_V7.0_BEAST_STABLE ]</p>
+        <h1 class="title">DEEPESH</h1>
+        <p style="opacity: 0.6; margin-top: 10px;">CCSU BCA ARCHITECT | NOIDA DATA_CENTER</p>
+
+        <div class="orb-container">
+            <div class="ai-orb" id="orb" onclick="igniteTitan()">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="#00f2ff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z"/></svg>
+            </div>
+        </div>
+
+        <div id="cmd-echo" style="font-size: 1.2rem; color: var(--main); height: 30px; font-weight: bold;">WAITING_FOR_INPUT</div>
+
+        <div class="status-bar">
+            <span>MEM: 98.4% FREE</span>
+            <span>Uptime: 240:12:05</span>
+            <span>OS: TITAN_BEAST</span>
+        </div>
+    </div>
+</section>
+
+<!-- DATA SECTION -->
+<section id="data-hub">
+    <div class="beast-frame">
+        <h2 style="font-family: 'Orbitron'; font-size: 2rem; margin-bottom: 30px;">DATABASE_OVERVIEW</h2>
+        <div class="grid-layout">
+            <div class="data-card"><h3>JAVA_LOGIC</h3><p>Architecture, OOPs, Collections, Multithreading.</p></div>
+            <div class="data-card"><h3>PYTHON_AI</h3><p>Neural Networks, Automation, Logic Processing.</p></div>
+            <div class="data-card"><h3>WEB_CORE</h3><p>Three.js, React, Backend Integration.</p></div>
+            <div class="data-card"><h3>SQL_MASTER</h3><p>Database Management, Optimization, Security.</p></div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // --- 3D GALAXY ENGINE (Beast Level) ---
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas-bg'), alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    // Dynamic Star Field
+    const starGeo = new THREE.BufferGeometry();
+    const starCoords = [];
+    for(let i=0; i<15000; i++) {
+        starCoords.push((Math.random() - 0.5) * 50, (Math.random() - 0.5) * 50, (Math.random() - 0.5) * 50);
+    }
+    starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starCoords, 3));
+    const starMat = new THREE.PointsMaterial({ color: 0x00f2ff, size: 0.02 });
+    const stars = new THREE.Points(starGeo, starMat);
+    scene.add(stars);
+
+    // Floating Grid
+    const grid = new THREE.GridHelper(100, 100, 0x00f2ff, 0x050505);
+    grid.position.y = -5;
+    scene.add(grid);
+
+    camera.position.z = 10;
+
+    function renderLoop() {
+        requestAnimationFrame(renderLoop);
+        stars.rotation.y += 0.0005;
+        grid.position.z += 0.05;
+        if(grid.position.z > 2) grid.position.z = 0;
+        renderer.render(scene, camera);
+    }
+    renderLoop();
+
+    // --- BEAST COMMAND ENGINE (50+ VARIATIONS) ---
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const rec = new SpeechRecognition();
+    rec.lang = 'en-US';
+
+    function igniteTitan() {
+        rec.start();
+        document.getElementById('orb').classList.add('active');
+        document.getElementById('cmd-echo').innerText = "LISTENING_TO_BOSS...";
+    }
+
+    function titanSpeak(txt) {
+        const synth = window.speechSynthesis;
+        const utter = new SpeechSynthesisUtterance(txt);
+        utter.rate = 1.0; utter.pitch = 0.8;
+        synth.speak(utter);
+    }
+
+    rec.onresult = (e) => {
+        const raw = e.results[0][0].transcript.toLowerCase();
+        document.getElementById('orb').classList.remove('active');
+        document.getElementById('cmd-echo').innerText = "> " + raw.toUpperCase();
+
+        // BEAST LOGIC (Pattern Matching)
+        if (raw.match(/skill|data|matrix|hub|what can you do/)) {
+            document.getElementById('data-hub').scrollIntoView({behavior: 'smooth'});
+            titanSpeak("Accessing Deepesh's high-level database. Systems active.");
+        }
+        else if (raw.match(/magic|red|protocol|hack/)) {
+            stars.material.color.setHex(0xff0055);
+            grid.material.color.setHex(0xff0055);
+            document.documentElement.style.setProperty('--main', '#ff0055');
+            titanSpeak("Red Protocol Engaged. Power levels at one hundred percent.");
+        }
+        else if (raw.match(/reset|default|blue/)) {
+            stars.material.color.setHex(0x00f2ff);
+            grid.material.color.setHex(0x00f2ff);
+            document.documentElement.style.setProperty('--main', '#00f2ff');
+            titanSpeak("Systems restored to default.");
+        }
+        else if (raw.match(/github|projects|code/)) {
+            titanSpeak("Opening repositories, Boss.");
+            window.open('https://github.com/TheDeepeshSingh', '_blank');
+        }
+        else if (raw.match(/linkedin|connect/)) {
+            titanSpeak("Redirecting to professional network.");
+            window.open('https://www.linkedin.com/in/deepeshsinghwork', '_blank');
+        }
+        else if (raw.match(/self destruct|boom|destroy/)) {
+            document.body.style.filter = "invert(1) hue-rotate(90deg)";
+            titanSpeak("Initiating emergency shutdown. Sequence overridden by Deepesh.");
+            setTimeout(() => document.body.style.filter = "none", 3000);
+        }
+        else if (raw.match(/status|health|diagnostics/)) {
+            titanSpeak("Titan OS is stable. Latency is five milliseconds. All cores operational.");
+        }
+        else if (raw.match(/time|clock/)) {
+            titanSpeak("System time is " + new Date().toLocaleTimeString());
+        }
+        else if (raw.match(/who is deepesh|who is the boss/)) {
+            titanSpeak("Deepesh Singh is the lead architect of this system. He is a BCA student at CCSU and a professional developer.");
+        }
+        else if (raw.match(/bye|shutdown|sleep/)) {
+            titanSpeak("Titan OS entering hibernation. Goodbye Boss.");
+        }
+        else {
+            titanSpeak("Command not found in my beast database.");
+        }
+    };
+
+    // Scroll Observer
+    window.addEventListener('scroll', () => {
+        let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        let scrolled = (winScroll / height) * 100;
+        document.getElementById("p-bar").style.height = scrolled + "%";
+    });
+
+    // Resize Fix
+    window.addEventListener('resize', () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    });
+</script>
+
+</body>
+</html>
