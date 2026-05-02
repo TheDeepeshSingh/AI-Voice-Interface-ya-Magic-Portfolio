@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deepesh Singh | Global Executive Portfolio</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=JetBrains+Mono:wght@300;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --main: #00f2ff; --sec: #ff0055; --bg: #020202; --glass: rgba(10, 10, 10, 0.9); }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); color: white; font-family: 'JetBrains Mono', monospace; scroll-behavior: smooth; overflow-x: hidden; }
+        
+        #canvas-bg { position: fixed; top: 0; left: 0; z-index: -1; pointer-events: none; }
+
+        section { min-height: 100vh; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 60px 20px; position: relative; }
+
+        .hud-frame {
+            border: 1px solid rgba(0, 242, 255, 0.3); padding: 40px; 
+            background: var(--glass); backdrop-filter: blur(15px);
+            clip-path: polygon(5% 0, 95% 0, 100% 5%, 100% 95%, 95% 100%, 5% 100%, 0 95%, 0 5%);
+            width: 100%; max-width: 850px; text-align: center; position: relative;
+        }
+
+        .title { font-family: 'Orbitron', sans-serif; font-size: clamp(2rem, 8vw, 3.5rem); color: var(--main); text-shadow: 0 0 20px rgba(0, 242, 255, 0.5); }
+        
+        .ai-orb {
+            width: 100px; height: 100px; border-radius: 50%; margin: 25px auto;
+            border: 2px solid var(--main); cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 25px var(--main); transition: 0.4s; background: rgba(0, 242, 255, 0.05);
+        }
+        .ai-orb.active { border-color: var(--sec); box-shadow: 0 0 40px var(--sec); animation: pulse-red 1s infinite; }
+        @keyframes pulse-red { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        .status-msg { color: var(--main); font-size: 0.8rem; margin: 15px 0; text-transform: uppercase; letter-spacing: 3px; min-height: 20px; }
+        
+        /* Professional Skills UI */
+        .skill-box { width: 100%; margin-top: 30px; text-align: left; }
+        .bar-bg { height: 12px; background: #111; margin: 10px 0; border: 1px solid #333; overflow: hidden; border-radius: 2px; }
+        .bar-fill { height: 100%; background: var(--main); width: 0%; transition: 2s cubic-bezier(0.1, 0, 0.1, 1); box-shadow: 0 0 15px var(--main); }
+
+        .btn-group { display: flex; gap: 15px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
+        .btn-elite { border: 1px solid var(--main); padding: 12px 25px; color: var(--main); text-decoration: none; transition: 0.3s; font-weight: bold; font-size: 0.8rem; }
+        .btn-elite:hover { background: var(--main); color: #000; box-shadow: 0 0 25px var(--main); }
+
+        .scroll-hint { position: absolute; bottom: 30px; font-size: 0.7rem; color: var(--main); animation: bounce 2s infinite; opacity: 0.5; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        h2 { font-family: 'Orbitron'; color: var(--main); margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<canvas id="canvas-bg"></canvas>
+
+<!-- SECTION 01: HERO -->
+<section id="home">
+    <div class="hud-frame">
+        <p style="font-size: 0.6rem; color: var(--sec); margin-bottom: 10px;">> ACCESS_LEVEL: CEO_ADMIN // DEEPESH_V3</p>
+        <h1 class="title">DEEPESH SINGH</h1>
+        <p style="opacity: 0.7; letter-spacing: 5px; font-size: 0.9rem;">BCA ARCHITECT | CCSU | NOIDA</p>
+
+        <div class="ai-orb" id="orb" onclick="startDeepu()">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="#00f2ff"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+        </div>
+
+        <div class="status-msg" id="status">INITIATE VOICE COMMANDS</div>
+
+        <div class="btn-group">
+            <a href="https://www.linkedin.com/in/deepeshsinghwork" target="_blank" class="btn-elite">LINKEDIN</a>
+            <a href="https://github.com/TheDeepeshSingh" target="_blank" class="btn-elite">GITHUB</a>
+            <a href="mailto:deepesh.work26@gmail.com" class="btn-elite">EMAIL</a>
+        </div>
+    </div>
+    <div class="scroll-hint">SCROLL TO ANALYZE ↓</div>
+</section>
+
+<!-- SECTION 02: SKILLS -->
+<section id="skill-section">
+    <div class="hud-frame">
+        <h2>CORE_MAINFRAME</h2>
+        <div class="skill-box">
+            <p>JAVA DEVELOPMENT <span style="float:right">90%</span></p>
+            <div class="bar-bg"><div class="bar-fill" id="b1"></div></div>
+            
+            <p style="margin-top:20px">PYTHON LOGIC <span style="float:right">85%</span></p>
+            <div class="bar-bg"><div class="bar-fill" id="b2"></div></div>
+            
+            <p style="margin-top:20px">FULL-STACK ARCHITECTURE <span style="float:right">95%</span></p>
+            <div class="bar-bg"><div class="bar-fill" id="b3"></div></div>
+
+            <p style="margin-top:20px">SQL DATABASE <span style="float:right">80%</span></p>
+            <div class="bar-bg"><div class="bar-fill" id="b4"></div></div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // --- 3D GLOBAL GRID (THREE.JS) ---
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas-bg'), alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    // Grid Floor
+    const gridHelper = new THREE.GridHelper(20, 40, 0x00f2ff, 0x111111);
+    gridHelper.position.y = -2;
+    scene.add(gridHelper);
+
+    // Floating Particles
+    const particles = new THREE.Points(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(3000 * 3).map(() => (Math.random() - 0.5) * 15), 3)),
+        new THREE.PointsMaterial({ size: 0.015, color: 0x00f2ff })
+    );
+    scene.add(particles);
+
+    camera.position.z = 5;
+    camera.position.y = 1;
+
+    function animate() {
+        requestAnimationFrame(animate);
+        particles.rotation.y += 0.001;
+        gridHelper.position.z += 0.02;
+        if (gridHelper.position.z > 1) gridHelper.position.z = 0;
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    // --- DEEPU AI v3.0 (UNIVERSAL) ---
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const rec = new SpeechRecognition();
+    rec.lang = 'en-US';
+    rec.continuous = false;
+
+    const orb = document.getElementById('orb');
+    const status = document.getElementById('status');
+
+    function startDeepu() {
+        try {
+            rec.start();
+            orb.classList.add('active');
+            status.innerText = "LISTENING_MAINFRAME...";
+        } catch(e) {}
+    }
+
+    function speak(text) {
+        const s = new SpeechSynthesisUtterance(text);
+        s.rate = 1;
+        s.pitch = 0.9;
+        window.speechSynthesis.speak(s);
+    }
+
+    rec.onresult = (e) => {
+        const cmd = e.results[0][0].transcript.toLowerCase();
+        orb.classList.remove('active');
+        status.innerText = "DECRYPTED: " + cmd.toUpperCase();
+
+        if (cmd.includes('skill')) {
+            document.getElementById('skill-section').scrollIntoView({ behavior: 'smooth' });
+            speak("Accessing skills database. Loading Java and Python proficiencies.");
+            // Reset and Animate Bars
+            ["b1","b2","b3","b4"].forEach(id => document.getElementById(id).style.width = "0%");
+            setTimeout(() => {
+                document.getElementById('b1').style.width = "90%";
+                document.getElementById('b2').style.width = "85%";
+                document.getElementById('b3').style.width = "95%";
+                document.getElementById('b4').style.width = "80%";
+            }, 600);
+        } 
+        else if (cmd.includes('magic')) {
+            particles.material.color.setHex(0xff0055);
+            gridHelper.material.color.setHex(0xff0055);
+            speak("Magic protocol initiated. Switching environment to Crimson Cyber.");
+        }
+        else if (cmd.includes('hello') || cmd.includes('hi') || cmd.includes('deepu')) {
+            speak("Welcome Deepesh. System is fully operational at CCSU. How can I help you?");
+        }
+        else if (cmd.includes('linkedin')) {
+            speak("Opening professional link.");
+            window.open('https://www.linkedin.com/in/deepeshsinghwork');
+        }
+    };
+
+    rec.onerror = () => {
+        orb.classList.remove('active');
+        status.innerText = "ERROR. TRY AGAIN.";
+    };
+
+    window.addEventListener('resize', () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    });
+</script>
+</body>
+</html>
